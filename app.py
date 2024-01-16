@@ -15,11 +15,8 @@ def index():
 @app.route('/usuarios/listar')
 def listar_usuarios():    
     cur.execute('SELECT * FROM usuarios')
-    resultados = list()
     
-    for usuario in cur.fetchall():
-        _, nombre, email = usuario
-        resultados.append({'nombre': nombre, 'email': email})
+    resultados = [{'nombre': nombre, 'email': email} for _, nombre, email in cur.fetchall()]
         
     return jsonify(resultados)
       
