@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 # Conectamos con nuestra BBDD
-conn = psycopg2.connect(host = 'localhost', port = '5432', database = 'pps_database', user = 'postgres', password = '1234')
+conn = psycopg2.connect(host = 'mi-postgres', port = '5432', database = 'pps_database', user = 'postgres', password = '1234')
 cur = conn.cursor()
 
 @app.route('/')
