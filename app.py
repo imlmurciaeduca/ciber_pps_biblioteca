@@ -1,33 +1,38 @@
 import psycopg2
+from flask import Flask, request, jsonify
 
-def listar_usuarios():
-    print('##########################################')
-    print('### Lista de usuarios de la Biblioteca ###')
-    print('##########################################')
-    print()
-    
+# Instanciamos Flask
+app = Flask(__name__)
+
+# Conectamos con nuestra BBDD
+conn = psycopg2.connect(host = 'localhost', port = '5432', database = 'pps_database', user = 'postgres', password = '1234')
+cur = conn.cursor()
+
+@app.route('/')
+def index():
+    return 'Aquí no hay nada que ver'
+
+@app.route('/usuarios/listar')
+def listar_usuarios():    
     cur.execute('SELECT * FROM usuarios')
+    resultados = list()
     
     for usuario in cur.fetchall():
         _, nombre, email = usuario
-        print(f'Nombre: {nombre}. Email: {email}')
+        resultados.append({'nombre': nombre, 'email': email})
         
-    print()
-        
-        
+    return jsonify(resultados)
+      
 def insertar_usuario(nombre: str, email: str):
     cur.execute(f'INSERT INTO usuarios(nombre, email) VALUES(\'{nombre}\', \'{email}\')')
     conn.commit()
-    print(f'Insertado {nombre} con email {email}')
-    print()
-    
 
-with psycopg2.connect(host = 'localhost', port = '5432', database = 'pps_database', user = 'postgres', password = '1234') as conn:
-    cur = conn.cursor()
-    
-    while True:
-        listar_usuarios()
-        
-        nombre, email = input('Introduce nombre#email: ').split('#')
-        
-        insertar_usuario(nombre, email)
+@app.route('/usuarios/add', methods = ['POST'])
+def add_usuario():
+    data = dict(request.get_json())
+    nombre = data['nombre']
+    email = data['email']
+    insertar_usuario(nombre, email)
+    return jsonify(success=True, nombre = nombre, email = email)
+
+app.run(host='0.0.0.0')
